@@ -1,0 +1,26 @@
+{
+  "name": "farmacia-backend",
+  "version": "1.0.0",
+  "description": "Backend del Sistema de Farmacia - Arquitectura MVC con Node.js, Express y Sequelize",
+  "main": "server.js",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "db:sync": "node scripts/syncDatabase.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "morgan": "^1.10.0",
+    "mysql2": "^3.11.0",
+    "sequelize": "^6.37.3"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  }
+}
