@@ -3,6 +3,8 @@ const cors = require('cors');
 const morgan = require('morgan');
 
 const routes = require('./routes');
+const authRoutes = require('./routes/authRoutes');
+const { verificarToken } = require('./middlewares/auth');
 const errorHandler = require('./middlewares/errorHandler');
 
 const app = express();
@@ -16,7 +18,8 @@ app.get('/', (req, res) => {
   res.json({ mensaje: 'API Sistema de Farmacia funcionando correctamente' });
 });
 
-app.use('/api', routes);
+app.use('/api/auth', authRoutes);
+app.use('/api', verificarToken, routes);
 
 app.use(errorHandler);
 

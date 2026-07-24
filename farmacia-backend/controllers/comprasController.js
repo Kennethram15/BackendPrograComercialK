@@ -35,6 +35,12 @@ comprasController.crearCompraCompleta = async (req, res) => {
       if (!item.fecha_vencimiento) {
         throw new Error(`Falta la fecha de vencimiento para ${medicamento.nombre_medicamento}`);
       }
+      // No se puede recibir un lote que ya nace vencido
+      if (new Date(item.fecha_vencimiento) < new Date(fecha_compra)) {
+        throw new Error(
+          `El lote de ${medicamento.nombre_medicamento} ya está vencido (vence antes de la fecha de compra)`
+        );
+      }
 
       const subtotal = Number(item.precio_lote) * item.cantidad;
       totalCompra += subtotal;
@@ -50,7 +56,6 @@ comprasController.crearCompraCompleta = async (req, res) => {
         { transaction: t }
       );
 
-      // Genera el lote nuevo que entra por esta compra
       await Lote.create(
         {
           id_medicamento: item.id_medicamento,
@@ -66,10 +71,19 @@ comprasController.crearCompraCompleta = async (req, res) => {
       await medicamento.save({ transaction: t });
     }
 
+    // Validar que el total de la compra cuadre con la suma real de los detalles guardados
+    const detallesGuardados = await DetalleCompra.findAll({
+      where: { id_compra: compra.id_compra },
+      transaction: t,
+    });
+    const sumaDetalles = detallesGuardados.reduce((acc, d) => acc + Number(d.subtotal_detalle_compra), 0);
+    if (Math.abs(sumaDetalles - totalCompra) > 0.01) {
+      throw new Error('El total de la compra no cuadra con la suma de sus detalles');
+    }
+
     compra.total_compra = totalCompra;
     await compra.save({ transaction: t });
 
-    // Actualiza los acumulados del proveedor
     const proveedor = await Proveedor.findByPk(id_proveedor, { transaction: t });
     if (proveedor) {
       proveedor.total_adquirido_proveedor = Number(proveedor.total_adquirido_proveedor) + totalCompra;
