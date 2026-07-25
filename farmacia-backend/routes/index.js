@@ -16,5 +16,6 @@ router.use('/ventas', require('./ventaRoutes'));
 router.use('/detalle-ventas', require('./detalleVentaRoutes'));
 router.use('/metodos-pago', require('./metodosPagoRoutes'));
 router.use('/detalle-metodos-pago', require('./detalleMetodosPagoRoutes'));
+router.use('/reportes', require('./reporteRoutes'));
 
 module.exports = router;
